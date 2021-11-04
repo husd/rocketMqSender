@@ -1,0 +1,2 @@
+# rocketMqSender
+给rocketMQ的nameserver broker producer consumer等发送TCP报文的工具 仅仅用来学习rocketMQ使用
