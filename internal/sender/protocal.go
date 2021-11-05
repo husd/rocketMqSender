@@ -24,7 +24,7 @@ type mqProtocolHeader struct {
 	Opaque    int32
 	Flag      int32
 	Remark    string
-	ExtFields string
+	ExtFields map[string]string
 }
 
 // 这里并没有计算长度，后续转字节数组的时候再计算
@@ -68,7 +68,7 @@ func toByteArray(mq *mqProtocol) []byte {
 	bodyByte := []byte(body)
 	bodyLen := len(bodyByte)
 
-	length := 4 + 4 + headerLen + bodyLen
+	length := 4 + headerLen + bodyLen
 	serializeTypeHeaderLength := calcSeriAndHeaderLen(seriType, headerLen)
 
 	mq.Length = int32(length)

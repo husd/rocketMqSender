@@ -27,6 +27,8 @@ func initConfig(f string) {
 	fmt.Println("nameserver:", getNameserver())
 	fmt.Println("broker:", getBroker())
 	fmt.Println("version:", getVersion())
+	fmt.Println("------------------基本配置信息------------------")
+	fmt.Println("                                              ")
 }
 
 func getNameserver() string {
@@ -48,10 +50,10 @@ func getVersion() int32 {
 	return int32(code)
 }
 
-func getExtFieldsByCode(code reqCode) string {
+func getExtFieldsByCode(code reqCode) map[string]string {
 
 	key := fmt.Sprintf("extField_%d", int(code))
-	return v.GetString(key)
+	return v.GetStringMapString(key)
 }
 
 func getBodyByCode(code reqCode) string {

@@ -33,13 +33,29 @@ func sendTcp(mqReq *mqProtocol, server string) {
 	body := toByteArray(mqReq)
 	desc := client.src + " ~ " + client.dst
 	reqMsg, _ := getReqCodeMsg(int(client.mqReq.Header.Code))
-	fmt.Println(now(), "发送包------------------------[", desc, "]--------------------")
-	fmt.Println(now(), "[", reqMsg, "][请求][", client.mqReq.Header.Code, "] 消息体 :", toJson(client.mqReq))
+	fmt.Println(now(), "[发送包]------------------------[", desc, "]--------------------")
+	fmt.Println(now(), "[发送包][", reqMsg, "][请求][", client.mqReq.Header.Code, "] 消息体 :", toJson(client.mqReq))
 	client.sendReq(body)
 
-	go client.receiveResp()
-	// 等待关闭
-	<-client.stopChan
+	needResp := needRespByCode(client.mqReq.Header.Code)
+	if needResp {
+		go client.receiveResp()
+		// 等待关闭
+		<-client.stopChan
+	} else {
+		fmt.Println("[响应包] 没有响应包，是单向消息")
+	}
+
+}
+
+func needRespByCode(code int32) bool {
+
+	switch code {
+	case 34:
+		return false
+	default:
+		return true
+	}
 }
 
 //客户端对象
@@ -55,26 +71,24 @@ type TcpClient struct {
 func (client *TcpClient) receiveResp() {
 
 	now := now()
-	for {
-		length := client.readInt()
-		serializeTypeHeaderLength := client.readInt()
-		headerLengh := (serializeTypeHeaderLength & 0xffffffff)
-		header := client.readString(headerLengh)
-		mqHeader := &mqProtocolHeader{}
-		err := json.Unmarshal(header, mqHeader)
-		if err != nil {
-			fmt.Println(now, "消息头数据 :", header)
-		}
-		bodyLen := length - 4 - 4 - headerLengh
-		body := client.readString(bodyLen)
-		msg, _ := getRespCodeMsg(int(mqHeader.Code))
-
-		desc := client.src + " ~ " + client.dst
-		fmt.Println(now, "------------------------[", desc, "]--------------------")
-		fmt.Println(now, "[", msg, "][响应][header][", mqHeader.Code, "] 消息头数据 :", header)
-		fmt.Println(now, "[", msg, "][响应][body][", body)
-		close(client.stopChan)
+	length := client.readInt()
+	serializeTypeHeaderLength := client.readInt()
+	headerLength := (serializeTypeHeaderLength & 0xffffffff)
+	header := client.readString(headerLength)
+	mqHeader := &mqProtocolHeader{}
+	err := json.Unmarshal(header, mqHeader)
+	if err != nil {
+		fmt.Println(now, "消息头数据 :", header)
 	}
+	bodyLen := length - 4 - headerLength
+	body := client.readString(bodyLen)
+	msg, _ := getRespCodeMsg(int(mqHeader.Code))
+
+	desc := client.dst + " ~ " + client.src
+	fmt.Println(now, "[响应包]------------------------[", desc, "]--------------------")
+	fmt.Println(now, "[响应包][", msg, "][响应][消息头数据]", string(header))
+	fmt.Println(now, "[响应包][", msg, "][响应][body]", string(body))
+	close(client.stopChan)
 
 }
 
