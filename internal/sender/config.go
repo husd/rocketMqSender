@@ -16,6 +16,8 @@ func initConfig(f string) {
 
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
+	viper.AddConfigPath("../")
+	viper.AddConfigPath(f)
 	err := viper.ReadInConfig()
 	if err != nil {
 		fmt.Println("解析配置文件错误:", err)
@@ -27,6 +29,8 @@ func initConfig(f string) {
 	fmt.Println("nameserver:", getNameserver())
 	fmt.Println("broker:", getBroker())
 	fmt.Println("version:", getVersion())
+	fmt.Println("consumer:", getConsumer())
+	fmt.Println("producer:", getProducer())
 	fmt.Println("------------------基本配置信息------------------")
 	fmt.Println("                                              ")
 }
@@ -41,6 +45,16 @@ func getBroker() string {
 	return v.GetString("broker")
 }
 
+func getConsumer() string {
+
+	return v.GetString("consumer")
+}
+
+func getProducer() string {
+
+	return v.GetString("producer")
+}
+
 func getVersion() int32 {
 
 	code := v.GetInt("version")
@@ -50,10 +64,17 @@ func getVersion() int32 {
 	return int32(code)
 }
 
-func getExtFieldsByCode(code reqCode) map[string]string {
+func getExtFieldsByCode(code reqCode) map[string]interface{} {
 
 	key := fmt.Sprintf("extField_%d", int(code))
-	return v.GetStringMapString(key)
+	return v.GetStringMap(key)
+}
+
+func getFlagByCode(code reqCode) int32 {
+
+	key := fmt.Sprintf("flag_%d", int(code))
+	flag := v.GetInt32(key)
+	return flag
 }
 
 func getBodyByCode(code reqCode) string {

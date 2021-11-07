@@ -34,7 +34,7 @@ func sendTcp(mqReq *mqProtocol, server string) {
 	desc := client.src + " ~ " + client.dst
 	reqMsg, _ := getReqCodeMsg(int(client.mqReq.Header.Code))
 	fmt.Println(now(), "[发送包]------------------------[", desc, "]--------------------")
-	fmt.Println(now(), "[发送包][", reqMsg, "][请求][", client.mqReq.Header.Code, "] 消息体 :", toJson(client.mqReq))
+	fmt.Println(now(), "[发送包][", client.mqReq.Header.Code, "][", reqMsg, "][请求] 消息体 :", toJson(client.mqReq))
 	client.sendReq(body)
 
 	needResp := needRespByCode(client.mqReq.Header.Code)
@@ -70,7 +70,6 @@ type TcpClient struct {
 // 接收数据包 直接阻塞读取
 func (client *TcpClient) receiveResp() {
 
-	now := now()
 	length := client.readInt()
 	serializeTypeHeaderLength := client.readInt()
 	headerLength := (serializeTypeHeaderLength & 0xffffffff)
@@ -78,16 +77,16 @@ func (client *TcpClient) receiveResp() {
 	mqHeader := &mqProtocolHeader{}
 	err := json.Unmarshal(header, mqHeader)
 	if err != nil {
-		fmt.Println(now, "消息头数据 :", header)
+		fmt.Println(now(), "消息头数据错误 :", header)
 	}
 	bodyLen := length - 4 - headerLength
 	body := client.readString(bodyLen)
 	msg, _ := getRespCodeMsg(int(mqHeader.Code))
-
+	n := now()
 	desc := client.dst + " ~ " + client.src
-	fmt.Println(now, "[响应包]------------------------[", desc, "]--------------------")
-	fmt.Println(now, "[响应包][", msg, "][响应][消息头数据]", string(header))
-	fmt.Println(now, "[响应包][", msg, "][响应][body]", string(body))
+	fmt.Println(n, "[响应包]------------------------[", desc, "]--------------------")
+	fmt.Println(n, "[响应包][",mqHeader.Code,"][", msg, "][消息头数据]", string(header))
+	fmt.Println(n, "[响应包][",mqHeader.Code,"][", msg, "][body]", string(body))
 	close(client.stopChan)
 
 }

@@ -34,6 +34,10 @@ func getTargetByType(targetType int) string {
 		return getNameserver()
 	case 1:
 		return getBroker()
+	case 2:
+		return getConsumer()
+	case 3:
+		return getProducer()
 	default:
 		return getNameserver()
 	}

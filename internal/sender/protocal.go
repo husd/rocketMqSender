@@ -24,7 +24,7 @@ type mqProtocolHeader struct {
 	Opaque    int32
 	Flag      int32
 	Remark    string
-	ExtFields map[string]string
+	ExtFields map[string]interface{}
 }
 
 // 这里并没有计算长度，后续转字节数组的时候再计算
@@ -37,7 +37,7 @@ func NewMqReq(code reqCode) *mqProtocol {
 	header.Language = "JAVA"
 	header.Version = getVersion()
 	header.Opaque = 123456789
-	header.Flag = 0
+	header.Flag = getFlagByCode(code)
 	header.Remark = ""
 	header.ExtFields = getExtFieldsByCode(code)
 
