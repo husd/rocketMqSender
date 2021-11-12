@@ -85,8 +85,8 @@ func (client *TcpClient) receiveResp() {
 	n := now()
 	desc := client.dst + " ~ " + client.src
 	fmt.Println(n, "[响应包]------------------------[", desc, "]--------------------")
-	fmt.Println(n, "[响应包][",mqHeader.Code,"][", msg, "][消息头数据]", string(header))
-	fmt.Println(n, "[响应包][",mqHeader.Code,"][", msg, "][body]", string(body))
+	fmt.Println(n, "[响应包][", mqHeader.Code, "][", msg, "][消息头数据]", string(header))
+	fmt.Println(n, "[响应包][", mqHeader.Code, "][", msg, "][body]", string(body))
 	close(client.stopChan)
 
 }
