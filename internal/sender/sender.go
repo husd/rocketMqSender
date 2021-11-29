@@ -1,7 +1,9 @@
 package sender
 
+// SendMqReqByCode
 /**
  *
+ * 代码入口
  * @author hushengdong
  */
 func SendMqReqByCode(f string, code int, targetType int) {
