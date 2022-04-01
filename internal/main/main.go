@@ -14,7 +14,7 @@ import (
 func main() {
 
 	configFile := flag.String("f", "./internal", "配置文件地址")
-	code := flag.Int("c", 10, "请求代码 默认给nameserver发送一个心跳消息")
+	code := flag.Int("c", 28, "请求代码 默认给nameserver发送一个心跳消息")
 	targetType := flag.Int("t", 1, "向谁请求消息 0nameserver 1broker 2consumer 3producer")
 	flag.Parse()
 	sender.SendMqReqByCode(*configFile, *code, *targetType)
